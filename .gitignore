@@ -1,0 +1,5 @@
+.direnv/
+.python-version
+__pycache__/
+model.bin
+save.pkl
