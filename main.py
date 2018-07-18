@@ -105,6 +105,26 @@ def test(nnn, vectors, df, loop=30):
     print(df_result)
 
 
+def check_patterns(words, vectors):
+    sim_dict = {}
+    sim_dict["word"] = []
+    for word1 in words:
+        sim_dict["word"].append(word1)
+        sim_dict[word1] = []
+
+    for word1 in words:
+        for word2 in words:
+            sim_dict[word1].append(cos_sim(vectors[word1], vectors[word2]))
+
+    df = pd.DataFrame()
+    pd.set_option('display.unicode.east_asian_width', True)
+    df["word"] = sim_dict["word"]
+    for word1 in words:
+        df[word1] = sim_dict[word1]
+        print("{word}: {ranking}".format(word=word1, ranking=words[np.argsort(sim_dict[word1])[::-1][:3]]))
+    print(df)
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -116,8 +136,10 @@ if __name__ == "__main__":
 
     df = pd.read_csv("data.csv")
     words = np.unique(df.que.unique().tolist() + df.target.unique().tolist())
-
     vectors = get_vectors(words, dims=30*30)
+
+    check_patterns(words, vectors)
+
     nnn = NonmonotoneNeuralNetwork(size=len(list(vectors.values())[0]))
 
     if args.train:
